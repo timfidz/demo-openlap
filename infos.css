@@ -23,6 +23,12 @@ dialog.infos p {
 }
 /* Le bouton Fermer reprend le bouton de la page, sans son apparition retardée */
 dialog.infos .bouton { opacity: 1; animation: none; }
+/* À la fermeture, le texte et le voile s'effacent (classe sortie, posée par infos.js le temps du fondu) */
+dialog.infos[open].sortie { animation: infos-sortie .4s ease forwards; }
+dialog.infos[open].sortie::backdrop { animation: infos-voile-sortie .4s ease forwards; }
+/* (des animations à part : rejouer celle de l'entrée à l'envers ne repart pas, elle est déjà finie, et saute à la fin) */
+@keyframes infos-sortie { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px); } }
+@keyframes infos-voile-sortie { from { opacity: 1; } to { opacity: 0; } }
 @keyframes infos-entree { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes infos-voile { from { opacity: 0; } to { opacity: 1; } }
 

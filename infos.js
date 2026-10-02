@@ -1,7 +1,7 @@
 // Deuxième bouton de la page : affiche par-dessus le circuit le texte écrit par le client (page privée /admin,
 // champs « bouton2 » et « presentation » ; sans texte, le bouton et la fenêtre sont retirés de la page au moment où
 // elle est servie, voir functions/index.js). Le circuit continue de tourner derrière, assombri et flouté.
-// Fermeture : bouton Fermer, touche Échap, ou clic à côté du texte.
+// Fermeture : bouton Fermer, touche Échap, ou clic à côté du texte ; le texte s'efface en fondu, comme il est apparu.
 //
 // Mode « glisse » (fenêtre avec la classe glisse : plein écran et tracé libre) : pas de voile ; le nom et la phrase
 // montent, les boutons descendent, puis le texte apparaît en fondu dans l'espace libéré, la piste s'atténue ; l'inverse
@@ -87,7 +87,12 @@
 
   function fermer() {
     if (!fenetre.open || fenetre.classList.contains('sortie')) return;
-    if (!document.body.classList.contains('ecarte')) { fenetre.close(); return; }
+    // Sur le voile : le texte et le voile s'effacent, puis la fenêtre se ferme
+    if (!document.body.classList.contains('ecarte')) {
+      fenetre.classList.add('sortie');
+      window.setTimeout(function () { fenetre.close(); }, 400);
+      return;
+    }
     // Le texte s'efface d'abord (.3 s), puis le nom et les boutons se resserrent (.6 s)
     fenetre.classList.add('sortie');
     window.setTimeout(function () { document.body.classList.remove('ecarte'); }, 300);
