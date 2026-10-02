@@ -92,6 +92,7 @@
     .pied a { color: inherit; text-decoration: none; padding: 8px; }
     .pied a:hover, .pied a:focus-visible { color: var(--blanc); }
   </style>
+  <link rel="stylesheet" href="infos.css">
 </head>
 <body>
   <main class="ecran">
@@ -159,9 +160,26 @@
         <h1 class="cache" data-texte="nom">OPENLAP</h1>
       </div>
       <p class="phrase" data-texte="phrase">Coming summer 2027</p>
-      <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
+      <div class="boutons">
+        <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
+        <button type="button" class="bouton" data-infos data-si-presentation aria-haspopup="dialog" aria-controls="infos"><span data-texte="bouton2">Le projet</span></button>
+      </div>
       <p class="pied"><a href="mentions-legales.html">Mentions légales</a></p>
     </div>
+
+    <!-- Deuxième bouton : texte du client par-dessus le circuit (infos.js) ; retiré de la page s'il est vide (functions/index.js) -->
+    <dialog class="infos glisse" id="infos" aria-labelledby="infos-titre" data-si-presentation>
+      <div class="contenu" tabindex="-1" autofocus>
+        <h2 id="infos-titre" data-texte="nom">OPENLAP</h2>
+        <p data-texte="presentation">Karting indoor électrique haut de gamme, en région parisienne.
+Ouverture prévue à l'été 2027.
+
+Partenaires, fournisseurs : écrivez-nous.
+
+(Texte provisoire : le vôtre se saisit dans la page privée.)</p>
+        <button type="button" class="bouton" data-fermer>Fermer</button>
+      </div>
+    </dialog>
   </main>
 
   <script>
@@ -195,6 +213,16 @@
         }
         document.getElementById('bord-dedans').setAttribute('d', dedans + 'Z');
         document.getElementById('bord-dehors').setAttribute('d', dehors + 'Z');
+        // Un nombre entier de paires rouge et noir fait le tour de chaque bord : la longueur des blocs est ajustée
+        // (à quelques dixièmes près), sinon le dernier bloc est coupé là où la boucle se referme, sur la ligne droite de départ
+        ['bord-dedans', 'bord-dehors'].forEach(function (id) {
+          var lb = document.getElementById(id).getTotalLength();
+          [].forEach.call(document.querySelectorAll('use[href="#' + id + '"][stroke-dasharray]'), function (u) {
+            var base = parseFloat(u.getAttribute('stroke-dasharray'));
+            var bloc = lb / (2 * Math.max(1, Math.round(lb / (2 * base))));
+            u.setAttribute('stroke-dasharray', bloc.toFixed(3) + ' ' + bloc.toFixed(3));
+          });
+        });
       })();
 
       function placer(avance) {
@@ -232,7 +260,9 @@
       }
     })();
   </script>
+  <script src="infos.js" defer></script>
   <!-- Menu des essais : démonstration seulement, à retirer avant la mise en ligne -->
+  <script src="traces.js" defer></script>
   <script src="essais.js" defer></script>
 </body>
 </html>

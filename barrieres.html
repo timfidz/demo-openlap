@@ -85,6 +85,7 @@
     .pied a { color: inherit; text-decoration: none; padding: 8px; }
     .pied a:hover, .pied a:focus-visible { color: var(--blanc); }
   </style>
+  <link rel="stylesheet" href="infos.css">
 </head>
 <body>
   <main class="ecran">
@@ -224,10 +225,27 @@
 
     <div class="bas">
       <p class="phrase" data-texte="phrase">Coming summer 2027</p>
-      <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
+      <div class="boutons">
+        <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
+        <button type="button" class="bouton" data-infos data-si-presentation aria-haspopup="dialog" aria-controls="infos"><span data-texte="bouton2">Le projet</span></button>
+      </div>
     </div>
 
     <p class="pied"><a href="mentions-legales.html">Mentions légales</a></p>
+
+    <!-- Deuxième bouton : texte du client par-dessus le circuit (infos.js) ; retiré de la page s'il est vide (functions/index.js) -->
+    <dialog class="infos" id="infos" aria-labelledby="infos-titre" data-si-presentation>
+      <div class="contenu" tabindex="-1" autofocus>
+        <h2 id="infos-titre" data-texte="nom">OPENLAP</h2>
+        <p data-texte="presentation">Karting indoor électrique haut de gamme, en région parisienne.
+Ouverture prévue à l'été 2027.
+
+Partenaires, fournisseurs : écrivez-nous.
+
+(Texte provisoire : le vôtre se saisit dans la page privée.)</p>
+        <button type="button" class="bouton" data-fermer>Fermer</button>
+      </div>
+    </dialog>
   </main>
 
   <script>
@@ -280,7 +298,9 @@
       }
     })();
   </script>
+  <script src="infos.js" defer></script>
   <!-- Menu des essais : démonstration seulement, à retirer avant la mise en ligne -->
+  <script src="traces.js" defer></script>
   <script src="essais.js" defer></script>
 </body>
 </html>

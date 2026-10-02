@@ -49,6 +49,9 @@
     '.essais button:focus-visible { outline: 2px solid #f5f5f6; outline-offset: 3px; }' +
     '.essais .jeux { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; gap: 0 2px; padding: 0 2px 2px; }' +
     '.essais .jeux button { width: 38px; height: 24px; padding: 5px 4px; border-radius: 7px; }' +
+    '.essais button.bascule { width: auto; height: auto; margin-top: 4px; padding: 7px 10px; border-radius: 8px; background: none !important;' +
+    ' font: 500 11px/1 "Inter", "Segoe UI", Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #9a9aa2; }' +
+    '.essais button.bascule[aria-pressed="true"] { color: #f5f5f6; box-shadow: inset 2px 0 0 var(--rouge); }' +
     '@media (orientation: portrait) { .essais { left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; padding: 4px;' +
     ' max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }' +
     ' .essais a { padding: 7px 8px; font-size: 10px; letter-spacing: .06em; }' +
@@ -120,7 +123,31 @@
     boutonsJeux.appendChild(b);
   });
   nav.appendChild(boutonsJeux);
+
+  // Les traces de gomme dans les épingles (traces.js) : montrées ou non, choix retenu d'une page à l'autre
+  var boutonTraces = document.createElement('button');
+  boutonTraces.type = 'button';
+  boutonTraces.className = 'bascule';
+  boutonTraces.textContent = 'Traces';
+  boutonTraces.title = 'Traces de gomme dans les épingles';
+  function montrerTraces(oui) {
+    // traces.js ne calcule les traces qu'à leur première apparition
+    if (oui) document.dispatchEvent(new Event('traces:afficher'));
+    [].forEach.call(document.querySelectorAll('.traces'), function (g) {
+      g.style.display = oui ? '' : 'none';
+      if (oui) g.removeAttribute('hidden'); else g.setAttribute('hidden', '');
+    });
+    boutonTraces.setAttribute('aria-pressed', String(oui));
+  }
+  boutonTraces.addEventListener('click', function () {
+    var oui = boutonTraces.getAttribute('aria-pressed') !== 'true';
+    ecrire('essais-traces', oui ? 'oui' : 'non');
+    montrerTraces(oui);
+  });
+  if (document.querySelector('.traces')) nav.appendChild(boutonTraces);
   document.body.appendChild(nav);
+  // ?traces=1 dans l'adresse les impose (captures) ; sinon, le dernier choix fait
+  montrerTraces(adresse.has('traces') ? adresse.get('traces') === '1' : lire('essais-traces') === 'oui');
 
   // ?rouge=c8102e et ?blocs=bleu-jaune dans l'adresse imposent un choix (servent aux captures) ; sinon, le dernier choix fait
   var rougeVoulu = adresse.get('rouge') ? '#' + adresse.get('rouge').replace('#', '') : lire('essais-rouge');
