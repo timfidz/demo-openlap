@@ -1,6 +1,7 @@
-// Menu des essais : une aide de démonstration pour passer d'une version de la page à l'autre, essayer plusieurs rouges, et le rouge et noir ou le rouge et blanc.
+// Menu des essais : une aide de démonstration pour passer d'une version de la page à l'autre et essayer les couleurs
+// des vibreurs (plusieurs rouges, et les jeux de couleurs des plans du client).
 // À RETIRER AVANT LA MISE EN LIGNE : ce fichier, la balise <script src="essais.js"> de chaque page, et les pages non retenues.
-// Le rouge retenu sera alors écrit dans les pages elles-mêmes, à la place de #e10600.
+// Les couleurs retenues seront alors écrites dans les pages elles-mêmes, à la place de #e10600 et du noir des blocs.
 /* global location, document -- script de navigateur */
 (function () {
   var essais = [
@@ -18,8 +19,21 @@
     ['#a50f2d', 'Cramoisi']
   ];
   var ORIGINE = rouges[0][0];
+  // Les jeux de couleurs : [nom, libellé, couleur de fond du vibreur, couleur de ses blocs].
+  // « rouge » = le rouge choisi au-dessus ; « noir » = le noir écrit dans la page ; « fond » = la même couleur que le fond (trait uni).
+  // Les quatre derniers reprennent les plans envoyés par le client.
+  var jeux = [
+    ['noir', 'Rouge et noir', 'rouge', 'noir'],
+    ['blanc', 'Rouge et blanc', 'rouge', '#f5f5f6'],
+    ['uni', 'Rouge uni', 'rouge', 'fond'],
+    ['bleu', 'Rouge et bleu', 'rouge', '#1c5cff'],
+    ['bleu-jaune', 'Bleu et jaune', '#1c4fd8', '#ffe033']
+  ];
   // Selon l'hébergeur, l'adresse se termine par « grand.html », « grand » ou rien du tout (page d'accueil)
   var ici = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
+  var adresse = new URLSearchParams(location.search);
+  function lire(cle) { try { return localStorage.getItem(cle); } catch (e) { return null; } }
+  function ecrire(cle, valeur) { try { localStorage.setItem(cle, valeur); } catch (e) { /* stockage refusé : le choix ne vaut que pour cette page */ } }
 
   var style = document.createElement('style');
   style.textContent =
@@ -29,18 +43,18 @@
     ' letter-spacing: .12em; text-transform: uppercase; text-decoration: none; color: #9a9aa2; white-space: nowrap; }' +
     '.essais a:hover, .essais a:focus-visible { color: #f5f5f6; background: #f5f5f614; outline: none; }' +
     '.essais a[aria-current] { color: #f5f5f6; box-shadow: inset 2px 0 0 var(--rouge); }' +
-    '.essais .rouges { display: flex; justify-content: center; gap: 7px; margin-top: 6px; padding: 9px 4px 3px; border-top: 1px solid #f5f5f61f; }' +
-    '.essais button { width: 16px; height: 16px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; }' +
-    '.essais button[aria-pressed="true"] { box-shadow: 0 0 0 2px #050506, 0 0 0 3.5px #f5f5f6; }' +
+    '.essais .rouges { display: flex; justify-content: center; gap: 1px; margin-top: 6px; padding: 5px 2px 0; border-top: 1px solid #f5f5f61f; }' +
+    '.essais button { box-sizing: border-box; width: 24px; height: 24px; padding: 4px; border: 0; border-radius: 50%; background-clip: content-box !important; cursor: pointer; flex: none; }' +
+    '.essais button[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px #f5f5f6; }' +
     '.essais button:focus-visible { outline: 2px solid #f5f5f6; outline-offset: 3px; }' +
-    '.essais .blocs { display: flex; justify-content: center; gap: 10px; padding: 8px 4px 3px; }' +
-    '.essais .blocs button { width: 34px; height: 14px; border-radius: 4px; border: 1px solid #f5f5f633; }' +
+    '.essais .jeux { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; gap: 0 2px; padding: 0 2px 2px; }' +
+    '.essais .jeux button { width: 38px; height: 24px; padding: 5px 4px; border-radius: 7px; }' +
     '@media (orientation: portrait) { .essais { left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; padding: 4px;' +
     ' max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }' +
     ' .essais a { padding: 7px 8px; font-size: 10px; letter-spacing: .06em; }' +
     ' .essais a[aria-current] { box-shadow: inset 0 -2px 0 var(--rouge); }' +
-    ' .essais .rouges { width: auto; margin: 0; padding: 7px 6px 5px; border-top: 0; }' +
-    ' .essais .blocs { padding: 7px 6px 5px; } }';
+    ' .essais .rouges { width: auto; margin: 0; padding: 0 4px; border-top: 0; }' +
+    ' .essais .jeux { display: flex; padding: 0 4px; } }';
   document.head.appendChild(style);
 
   var nav = document.createElement('nav');
@@ -54,66 +68,64 @@
     nav.appendChild(lien);
   });
 
-  // Les pastilles de couleur : le rouge choisi remplace celui des pages, et il est retenu d'une page à l'autre
-  var traits = document.querySelectorAll('[stroke="' + ORIGINE + '"]');
+  // Dans les pages, chaque vibreur est fait de deux traits superposés : un trait continu (le fond), et des blocs par-dessus
+  var fonds = document.querySelectorAll('[stroke="' + ORIGINE + '"]');
+  var blocs = document.querySelectorAll('[stroke-dasharray][stroke="#050506"], [stroke-dasharray][stroke="#141416"]');
+  [].forEach.call(blocs, function (t) { t.dataset.noir = t.getAttribute('stroke'); });
+
+  var rouge = ORIGINE, jeu = jeux[0];
   var pastilles = document.createElement('div');
   pastilles.className = 'rouges';
   pastilles.setAttribute('role', 'group');
   pastilles.setAttribute('aria-label', 'Rouge des vibreurs');
-  function appliquer(couleur) {
-    for (var i = 0; i < traits.length; i++) traits[i].setAttribute('stroke', couleur);
-    nav.style.setProperty('--rouge', couleur);
-    [].forEach.call(pastilles.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.couleur === couleur)); });
+  var boutonsJeux = document.createElement('div');
+  boutonsJeux.className = 'jeux';
+  boutonsJeux.setAttribute('role', 'group');
+  boutonsJeux.setAttribute('aria-label', 'Couleurs des vibreurs');
+
+  function appliquer() {
+    var fond = jeu[2] === 'rouge' ? rouge : jeu[2];
+    [].forEach.call(fonds, function (t) { t.setAttribute('stroke', fond); });
+    [].forEach.call(blocs, function (t) { t.setAttribute('stroke', jeu[3] === 'noir' ? t.dataset.noir : jeu[3] === 'fond' ? fond : jeu[3]); });
+    nav.style.setProperty('--rouge', rouge);
+    [].forEach.call(pastilles.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.couleur === rouge)); });
+    [].forEach.call(boutonsJeux.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.jeu === jeu[0])); });
   }
-  function retenir(couleur) { try { localStorage.setItem('essais-rouge', couleur); } catch (e) { /* stockage refusé : le choix ne vaut que pour cette page */ } }
-  function retenu() { try { return localStorage.getItem('essais-rouge'); } catch (e) { return null; } }
-  rouges.forEach(function (rouge) {
+
+  // Les pastilles de rouge : le choix est retenu d'une page à l'autre
+  rouges.forEach(function (r) {
     var b = document.createElement('button');
     b.type = 'button';
-    b.dataset.couleur = rouge[0];
-    b.style.background = rouge[0];
-    b.title = rouge[1] + ' ' + rouge[0];
-    b.setAttribute('aria-label', rouge[1]);
-    b.addEventListener('click', function () { appliquer(rouge[0]); retenir(rouge[0]); });
+    b.dataset.couleur = r[0];
+    b.style.background = r[0];
+    b.title = r[1] + ' ' + r[0];
+    b.setAttribute('aria-label', r[1]);
+    b.addEventListener('click', function () { rouge = r[0]; ecrire('essais-rouge', rouge); appliquer(); });
     pastilles.appendChild(b);
   });
   nav.appendChild(pastilles);
 
-  // Les deux boutons des blocs : rouge et noir (ce qui est écrit dans les pages) ou rouge et blanc
-  var blocs = document.querySelectorAll('[stroke-dasharray][stroke="#050506"], [stroke-dasharray][stroke="#141416"]');
-  [].forEach.call(blocs, function (t) { t.dataset.noir = t.getAttribute('stroke'); });
-  var choixBlocs = document.createElement('div');
-  choixBlocs.className = 'blocs';
-  choixBlocs.setAttribute('role', 'group');
-  choixBlocs.setAttribute('aria-label', 'Couleur des blocs des vibreurs');
-  function appliquerBlocs(nom) {
-    [].forEach.call(blocs, function (t) { t.setAttribute('stroke', nom === 'blanc' ? '#f5f5f6' : t.dataset.noir); });
-    [].forEach.call(choixBlocs.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.blocs === nom)); });
-  }
-  [['noir', 'Rouge et noir', '#050506'], ['blanc', 'Rouge et blanc', '#f5f5f6']].forEach(function (c) {
+  // Les boutons des jeux de couleurs : moitié fond, moitié blocs
+  jeux.forEach(function (j) {
     var b = document.createElement('button');
+    var fond = j[2] === 'rouge' ? 'var(--rouge)' : j[2];
+    // sur le bouton, le noir est éclairci pour se détacher du fond du menu
+    var bloc = j[3] === 'noir' ? '#34343a' : j[3] === 'fond' ? fond : j[3];
     b.type = 'button';
-    b.dataset.blocs = c[0];
-    b.style.background = 'linear-gradient(90deg, var(--rouge) 50%, ' + c[2] + ' 50%)';
-    b.title = c[1];
-    b.setAttribute('aria-label', c[1]);
-    b.addEventListener('click', function () {
-      appliquerBlocs(c[0]);
-      try { localStorage.setItem('essais-blocs', c[0]); } catch (e) { /* stockage refusé : le choix ne vaut que pour cette page */ }
-    });
-    choixBlocs.appendChild(b);
+    b.dataset.jeu = j[0];
+    b.style.background = 'linear-gradient(90deg, ' + fond + ' 50%, ' + bloc + ' 50%)';
+    b.title = j[1];
+    b.setAttribute('aria-label', j[1]);
+    b.addEventListener('click', function () { jeu = j; ecrire('essais-blocs', jeu[0]); appliquer(); });
+    boutonsJeux.appendChild(b);
   });
-  nav.appendChild(choixBlocs);
+  nav.appendChild(boutonsJeux);
   document.body.appendChild(nav);
 
-  // ?rouge=c8102e dans l'adresse impose une couleur (sert aux captures) ; sinon, le dernier choix
-  var impose = new URLSearchParams(location.search).get('rouge');
-  var choix = impose ? '#' + impose.replace('#', '') : retenu();
-  var connus = rouges.map(function (r) { return r[0]; });
-  appliquer(connus.indexOf(choix) >= 0 ? choix : ORIGINE);
-
-  // ?blocs=blanc dans l'adresse impose le rouge et blanc (sert aux captures) ; sinon, le dernier choix
-  var blocsRetenus = null;
-  try { blocsRetenus = localStorage.getItem('essais-blocs'); } catch (e) { /* stockage refusé */ }
-  appliquerBlocs((new URLSearchParams(location.search).get('blocs') || blocsRetenus) === 'blanc' ? 'blanc' : 'noir');
+  // ?rouge=c8102e et ?blocs=bleu-jaune dans l'adresse imposent un choix (servent aux captures) ; sinon, le dernier choix fait
+  var rougeVoulu = adresse.get('rouge') ? '#' + adresse.get('rouge').replace('#', '') : lire('essais-rouge');
+  if (rouges.some(function (r) { return r[0] === rougeVoulu; })) rouge = rougeVoulu;
+  var jeuVoulu = adresse.get('blocs') || lire('essais-blocs');
+  jeux.forEach(function (j) { if (j[0] === jeuVoulu) jeu = j; });
+  appliquer();
 })();
