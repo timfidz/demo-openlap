@@ -3,9 +3,9 @@
 // elle est servie, voir functions/index.js). Le circuit continue de tourner derrière, assombri et flouté.
 // Fermeture : bouton Fermer, touche Échap, ou clic à côté du texte.
 //
-// Mode « glisse » (fenêtre avec la classe glisse, version plein écran) : pas de voile ; le nom et la phrase montent,
-// les boutons descendent, le texte arrive par le côté dans l'espace libéré, la piste s'atténue ; l'inverse à la
-// fermeture. S'il n'y a pas la place (petit écran, long texte), retour au voile (classe serre).
+// Mode « glisse » (fenêtre avec la classe glisse : plein écran et tracé libre) : pas de voile ; le nom et la phrase
+// montent, les boutons descendent, puis le texte apparaît en fondu dans l'espace libéré, la piste s'atténue ; l'inverse
+// à la fermeture, le texte d'abord. S'il n'y a pas la place (petit écran, long texte), retour au voile (classe serre).
 /* global document, location, window -- script de navigateur */
 (function () {
   var bouton = document.querySelector('[data-infos]');
@@ -88,10 +88,10 @@
   function fermer() {
     if (!fenetre.open || fenetre.classList.contains('sortie')) return;
     if (!document.body.classList.contains('ecarte')) { fenetre.close(); return; }
-    // Le texte repart, puis le nom et les boutons se resserrent
+    // Le texte s'efface d'abord (.3 s), puis le nom et les boutons se resserrent (.6 s)
     fenetre.classList.add('sortie');
-    document.body.classList.remove('ecarte');
-    window.setTimeout(function () { fenetre.close(); }, 420);
+    window.setTimeout(function () { document.body.classList.remove('ecarte'); }, 300);
+    window.setTimeout(function () { fenetre.close(); }, 950);
   }
 
   bouton.addEventListener('click', ouvrir);
