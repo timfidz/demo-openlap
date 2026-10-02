@@ -53,23 +53,20 @@
       }
     }
 
-    .centre { position: relative; isolation: isolate; display: grid; justify-items: center; padding: 24px; }
-    /* Un voile sombre derrière le texte : la piste qui passe dessous s'efface au lieu de gêner la lecture */
-    .centre::before {
-      content: ""; position: absolute; inset: -80px -150px; z-index: -1;
-      background: radial-gradient(closest-side, #050506f5 48%, #05050600);
-    }
+    /* La piste passe derrière le texte sans être effacée (un voile sombre au milieu faisait une tache).
+       Pour rester lisible quand la lumière passe dessous, chaque élément porte sa propre ombre, au ras des lettres. */
+    .centre { position: relative; display: grid; justify-items: center; padding: 24px; }
     /* pas d'opacité 0 au départ : le navigateur doit compter le nom comme contenu affiché */
     .marque { line-height: 0; opacity: .01; animation: paraitre 2.2s ease .6s forwards; }
-    .marque img { display: block; height: auto; width: clamp(240px, 30vw, 440px); }
+    .marque img { display: block; height: auto; width: clamp(240px, 30vw, 440px); filter: drop-shadow(0 0 3px #050506) drop-shadow(0 0 3px #050506) drop-shadow(0 0 5px #050506) drop-shadow(0 0 14px #050506); }
     @media (orientation: portrait) {
       .marque img { width: clamp(190px, 58vw, 300px); }
-      .centre::before { inset: -70px -60px; }
     }
     .cache { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .phrase {
       margin: clamp(18px, 3vh, 28px) 0 0;
-      font-size: clamp(14px, 1.5vw, 17px); font-weight: 300; letter-spacing: .08em; color: var(--voile);
+      font-size: clamp(14px, 1.5vw, 17px); font-weight: 300; letter-spacing: .08em; color: #a4a4ac;
+      text-shadow: 0 0 3px #050506, 0 0 3px #050506, 0 0 5px #050506, 0 0 6px #050506, 0 0 14px #050506;
       opacity: 0; animation: paraitre 1.4s ease .9s forwards;
     }
     .phrase:empty { display: none; }
@@ -77,7 +74,7 @@
       margin-top: clamp(22px, 4vh, 40px);
       display: inline-block; padding: 13px 36px;
       font-size: 13px; font-weight: 400; letter-spacing: .24em; text-transform: uppercase; text-decoration: none;
-      color: var(--blanc); border: 1px solid #f5f5f647; border-radius: 999px;
+      color: var(--blanc); border: 1px solid #f5f5f647; border-radius: 999px; background: #050506;
       transition: color .35s, background .35s, border-color .35s;
       opacity: 0; animation: paraitre 1.4s ease 1s forwards;
     }
@@ -88,7 +85,7 @@
 
     /* Sous le bouton, dans le bloc central : en bas de l'écran il tomberait sur la ligne de départ */
     .pied {
-      margin: clamp(18px, 3vh, 30px) 0 0;
+      margin: clamp(18px, 3vh, 30px) 0 0; text-shadow: 0 0 3px #050506, 0 0 3px #050506, 0 0 5px #050506, 0 0 12px #050506;
       font-size: 12px; letter-spacing: .06em; color: var(--voile);
       opacity: 0; animation: paraitre 1.4s ease 1.3s forwards;
     }
