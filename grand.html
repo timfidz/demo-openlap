@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#050506">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="noindex">
   <title>OPENLAP — Coming summer 2027</title>
   <meta name="description" content="OPENLAP, karting indoor électrique haut de gamme en Île-de-France. Ouverture prochaine.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -33,40 +33,48 @@
       overflow: hidden;
     }
 
-    /* Une affiche : le logo, la piste, le bouton */
+    /* Le circuit occupe tout l'écran ; le nom, la phrase et le bouton sont posés au centre, par-dessus */
     .ecran {
-      height: 100vh; height: 100svh; min-height: 480px;
-      display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; justify-items: center;
-      gap: clamp(12px, 2.6vh, 28px); padding: clamp(22px, 4.5vh, 48px) 20px 12px;
-      text-align: center;
+      position: relative; height: 100vh; height: 100svh; min-height: 420px;
+      overflow: hidden; display: grid; place-items: center; text-align: center;
     }
 
-    /* pas d'opacité 0 au départ : le navigateur doit compter le logo comme contenu affiché */
-    .marque { line-height: 0; opacity: .01; animation: paraitre 2.2s ease .6s forwards; }
-    .marque img { display: block; height: auto; width: min(86vw, clamp(84px, 17vh, 168px) * 3.754); /* 3,754 : largeur sur hauteur du logo */ }
-    .cache { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-
     /* La piste et la lumière */
-    .piste { position: relative; width: 100%; max-width: 1180px; container-type: size; }
+    .piste { position: absolute; inset: 0; }
     /* overflow visible : le halo de la lumière ne doit pas être coupé au bord du dessin */
     .piste svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
     @media (orientation: portrait) {
       /* Sur un écran en hauteur, la piste est tournée d'un quart de tour pour occuper la place */
       .piste svg {
         inset: auto; top: 50%; left: 50%;
-        width: 100cqh; height: 100cqw;
+        width: 100vh; width: 100svh; height: 100vw;
+        min-width: 520px;
         transform: translate(-50%, -50%) rotate(90deg);
       }
     }
 
-    .bas { display: grid; justify-items: center; }
+    .centre { position: relative; isolation: isolate; display: grid; justify-items: center; padding: 24px; }
+    /* Un voile sombre derrière le texte : la piste qui passe dessous s'efface au lieu de gêner la lecture */
+    .centre::before {
+      content: ""; position: absolute; inset: -80px -150px; z-index: -1;
+      background: radial-gradient(closest-side, #050506f5 48%, #05050600);
+    }
+    /* pas d'opacité 0 au départ : le navigateur doit compter le nom comme contenu affiché */
+    .marque { line-height: 0; opacity: .01; animation: paraitre 2.2s ease .6s forwards; }
+    .marque img { display: block; height: auto; width: clamp(240px, 30vw, 440px); }
+    @media (orientation: portrait) {
+      .marque img { width: clamp(190px, 58vw, 300px); }
+      .centre::before { inset: -70px -60px; }
+    }
+    .cache { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .phrase {
-      margin: 0 0 clamp(12px, 2.4vh, 22px);
+      margin: clamp(18px, 3vh, 28px) 0 0;
       font-size: clamp(14px, 1.5vw, 17px); font-weight: 300; letter-spacing: .08em; color: var(--voile);
       opacity: 0; animation: paraitre 1.4s ease .9s forwards;
     }
     .phrase:empty { display: none; }
     .bouton {
+      margin-top: clamp(22px, 4vh, 40px);
       display: inline-block; padding: 13px 36px;
       font-size: 13px; font-weight: 400; letter-spacing: .24em; text-transform: uppercase; text-decoration: none;
       color: var(--blanc); border: 1px solid #f5f5f647; border-radius: 999px;
@@ -78,8 +86,10 @@
     .bouton:focus-visible { outline: 2px solid var(--blanc); outline-offset: 5px; }
     @keyframes paraitre { to { opacity: 1; } }
 
+    /* Sous le bouton, dans le bloc central : en bas de l'écran il tomberait sur la ligne de départ */
     .pied {
-      margin: 0; font-size: 12px; letter-spacing: .06em; color: var(--voile);
+      margin: clamp(18px, 3vh, 30px) 0 0;
+      font-size: 12px; letter-spacing: .06em; color: var(--voile);
       opacity: 0; animation: paraitre 1.4s ease 1.3s forwards;
     }
     .pied a { color: inherit; text-decoration: none; padding: 8px; }
@@ -88,13 +98,9 @@
 </head>
 <body>
   <main class="ecran">
-    <div class="marque">
-      <img src="images/logo-openlap-70.png" width="1554" height="538" alt="">
-      <h1 class="cache" data-texte="nom">OPENLAP</h1>
-    </div>
-
     <div class="piste" aria-hidden="true">
-      <svg viewBox="47 13 1421 912" preserveAspectRatio="xMidYMid meet">
+      <!-- Le cadre serre le tracé : la piste va jusqu'aux bords de l'écran -->
+      <svg viewBox="85 41 1340 855" preserveAspectRatio="xMidYMid meet">
         <defs>
           <!-- Le tracé du circuit du client : l'axe de la piste, relevé sur son plan type (releve-plan.json) -->
           <path id="trace" d="M 330 851 L 1300 851 C 1345 851 1380 816 1380 771 L 1380 150 C 1380 108 1352 88 1318 88 C 1283 88 1255 108 1255 150 L 1255 680 C 1255 715 1232 739 1196 739 L 770 739 C 700 739 645 720 645 660 C 645 600 700 570 745 540 C 780 515 797 480 797 440 L 797 270 C 797 215 840 195 877 195 C 914 195 957 215 957 270 L 957 560 C 957 600 990 626 1034 626 C 1080 626 1112 600 1112 560 L 1112 150 C 1112 118 1086 92 1054 92 L 712 92 C 678 92 652 118 652 152 L 652 480 C 652 522 622 545 582 545 C 542 545 512 522 512 480 L 512 150 C 512 115 486 86 454 86 L 190 86 C 155 86 130 110 130 146 L 130 300 C 130 340 155 362 190 362 C 225 362 250 340 250 300 L 250 250 C 250 212 280 190 314 190 C 350 190 380 212 380 250 L 380 520 C 380 620 330 655 255 690 C 115 755 75 851 255 851 Z"/>
@@ -113,7 +119,7 @@
                  les deux bords de la piste s'allument au même niveau, même dans un virage.
                  Sa largeur est celle de la piste : il ne déborde pas sur les couloirs voisins.
                  Chaque bande éclaire une longueur derrière la lumière, rien devant (en unités du tracé, ou en part du tour). -->
-            <g fill="none" stroke="#fff" stroke-width="72" id="sillage">
+            <g fill="none" stroke="#fff" stroke-width="56" id="sillage">
               <use href="#trace" stroke-opacity=".26" data-arriere=".26t"/>
               <use href="#trace" stroke-opacity=".4" data-arriere=".11t"/>
               <use href="#trace" stroke-opacity=".16" data-arriere="300"/>
@@ -124,41 +130,41 @@
           </mask>
         </defs>
 
-        <!-- Toute la piste reste visible, faiblement éclairée : le sol, et en très atténué les vibreurs, la grille et le damier -->
-        <use href="#trace" fill="none" stroke="#0e0e10" stroke-width="58" stroke-linejoin="round"/>
-        <g fill="none" stroke-linejoin="round" opacity=".3">
-          <g stroke-width="4">
-            <use href="#bord-dedans" stroke="#e10600"/><use href="#bord-dedans" stroke="#050506" stroke-dasharray="26 26"/>
-            <use href="#bord-dehors" stroke="#e10600"/><use href="#bord-dehors" stroke="#050506" stroke-dasharray="26 26"/>
-          </g>
-          <path d="M 690 830 H 706 V 872 H 690 M 785 830 H 801 V 872 H 785 M 880 830 H 896 V 872 H 880 M 975 830 H 991 V 872 H 975 M 1070 830 H 1086 V 872 H 1070 M 1160 830 H 1176 V 872 H 1160" stroke="#f5f5f6" stroke-width="2"/>
-          <g stroke="none" fill="#f5f5f6"><rect x="1255" y="824" width="9" height="9"/><rect x="1264" y="833" width="9" height="9"/><rect x="1255" y="842" width="9" height="9"/><rect x="1264" y="851" width="9" height="9"/><rect x="1255" y="860" width="9" height="9"/><rect x="1264" y="869" width="9" height="9"/></g>
+        <!-- La piste au repos : un ruban sombre uni, sans couleur ; seuls la grille et le damier s'y devinent -->
+        <use href="#trace" fill="none" stroke="#101013" stroke-width="46" stroke-linejoin="round"/>
+        <g fill="none" opacity=".22">
+          <path d="M 690 834 H 704 V 868 H 690 M 785 834 H 799 V 868 H 785 M 880 834 H 894 V 868 H 880 M 975 834 H 989 V 868 H 975 M 1070 834 H 1084 V 868 H 1070 M 1160 834 H 1174 V 868 H 1160" stroke="#f5f5f6" stroke-width="2"/>
+          <g stroke="none" fill="#f5f5f6"><rect x="1255" y="833" width="9" height="9"/><rect x="1264" y="842" width="9" height="9"/><rect x="1255" y="851" width="9" height="9"/><rect x="1264" y="860" width="9" height="9"/></g>
         </g>
 
-        <!-- La même piste en pleine lumière, révélée par le masque au passage de la lumière : le sol, les vibreurs rouge et noir sur les deux bords, la grille et le damier de départ -->
+        <!-- La piste en pleine lumière, révélée par le masque au passage de la lumière : le sol, les vibreurs rouge et noir
+             (le rouge n'existe que là), la grille et le damier de départ -->
         <g mask="url(#eclairage)" fill="none" stroke-linejoin="round">
-          <use href="#trace" stroke="#17171a" stroke-width="60"/>
-          <g stroke-width="4">
+          <use href="#trace" stroke="#1b1b1f" stroke-width="48"/>
+          <g stroke-width="3.5">
             <use href="#bord-dedans" stroke="#e10600"/><use href="#bord-dedans" stroke="#050506" stroke-dasharray="26 26"/>
             <use href="#bord-dehors" stroke="#e10600"/><use href="#bord-dehors" stroke="#050506" stroke-dasharray="26 26"/>
           </g>
-          <path d="M 690 830 H 706 V 872 H 690 M 785 830 H 801 V 872 H 785 M 880 830 H 896 V 872 H 880 M 975 830 H 991 V 872 H 975 M 1070 830 H 1086 V 872 H 1070 M 1160 830 H 1176 V 872 H 1160" stroke="#f5f5f6" stroke-width="2"/>
-          <g stroke="none" fill="#f5f5f6"><rect x="1255" y="824" width="9" height="9"/><rect x="1264" y="833" width="9" height="9"/><rect x="1255" y="842" width="9" height="9"/><rect x="1264" y="851" width="9" height="9"/><rect x="1255" y="860" width="9" height="9"/><rect x="1264" y="869" width="9" height="9"/></g>
+          <path d="M 690 834 H 704 V 868 H 690 M 785 834 H 799 V 868 H 785 M 880 834 H 894 V 868 H 880 M 975 834 H 989 V 868 H 975 M 1070 834 H 1084 V 868 H 1070 M 1160 834 H 1174 V 868 H 1160" stroke="#f5f5f6" stroke-width="2"/>
+          <g stroke="none" fill="#f5f5f6"><rect x="1255" y="833" width="9" height="9"/><rect x="1264" y="842" width="9" height="9"/><rect x="1255" y="851" width="9" height="9"/><rect x="1264" y="860" width="9" height="9"/></g>
         </g>
 
         <!-- Le trait de lumière et le phare -->
-        <use id="filet" href="#trace" fill="none" stroke="#f3f6ff" stroke-width="2" stroke-linecap="round" stroke-opacity=".9"/>
-        <circle id="lueur" r="105" fill="url(#phare)"/>
-        <circle id="point" r="5.5" fill="#fff"/>
+        <use id="filet" href="#trace" fill="none" stroke="#f3f6ff" stroke-width="1.8" stroke-linecap="round" stroke-opacity=".9"/>
+        <circle id="lueur" r="80" fill="url(#phare)"/>
+        <circle id="point" r="4.5" fill="#fff"/>
       </svg>
     </div>
 
-    <div class="bas">
+    <div class="centre">
+      <div class="marque">
+        <img src="images/nom-openlap.png" width="1554" height="130" alt="">
+        <h1 class="cache" data-texte="nom">OPENLAP</h1>
+      </div>
       <p class="phrase" data-texte="phrase">Coming summer 2027</p>
       <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
+      <p class="pied"><a href="mentions-legales.html">Mentions légales</a></p>
     </div>
-
-    <p class="pied"><a href="mentions-legales.html">Mentions légales</a></p>
   </main>
 
   <script>
@@ -174,7 +180,7 @@
       var bandes = [].map.call(sillage, function (u) { return longueur(u.dataset.arriere); });
       var filetLong = 0.12 * total;
       var depart = 600;          // le point de départ, en unités du tracé : sur la grille, avant la ligne
-      var tour = 18000;          // durée d'un tour, en ms
+      var tour = 24000;          // durée d'un tour, en ms : la piste est grande, la lumière prend son temps
 
       // Les vibreurs suivent chaque bord de la piste : leurs blocs gardent la même longueur
       // à l'intérieur et à l'extérieur des virages (un pointillé posé sur l'axe s'étirerait dehors et se tasserait dedans)
@@ -186,7 +192,7 @@
         for (var i = 0; i < n; i++) {
           var avant = pts[(i - 1 + n) % n], apres = pts[(i + 1) % n];
           var tx = apres.x - avant.x, ty = apres.y - avant.y, l = Math.hypot(tx, ty) || 1;
-          var nx = -ty / l * 31, ny = tx / l * 31, c = i ? 'L' : 'M';
+          var nx = -ty / l * 24, ny = tx / l * 24, c = i ? 'L' : 'M';
           dedans += c + (pts[i].x + nx).toFixed(1) + ' ' + (pts[i].y + ny).toFixed(1);
           dehors += c + (pts[i].x - nx).toFixed(1) + ' ' + (pts[i].y - ny).toFixed(1);
         }

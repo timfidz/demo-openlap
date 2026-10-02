@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050506">
+  <meta name="robots" content="noindex">
+  <title>OPENLAP — Coming summer 2027</title>
+  <meta name="description" content="OPENLAP, karting indoor électrique haut de gamme en Île-de-France. Ouverture prochaine.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="polices/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("polices/inter.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    :root {
+      --fond: #050506;
+      --blanc: #f5f5f6;
+      --voile: #8e8e96;
+      --rouge: #e10600;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--fond);
+      color: var(--blanc);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    .ecran {
+      position: relative; height: 100vh; height: 100svh; min-height: 420px;
+      overflow: hidden; display: grid; place-items: center; text-align: center;
+    }
+
+    /* La piste et la lumière */
+    .piste { position: absolute; inset: 0; }
+    .piste svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+    @media (orientation: portrait) {
+      .piste svg {
+        inset: auto; top: 50%; left: 50%;
+        width: 100vh; width: 100svh; height: 100vw;
+        min-width: 520px;
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+    }
+
+    /* Le logo, la phrase et le bouton, au centre de la piste */
+    .centre { position: relative; display: grid; justify-items: center; padding: 24px; }
+    /* pas d'opacité 0 au départ : le navigateur doit compter le logo comme contenu affiché */
+    .marque { line-height: 0; opacity: .01; animation: paraitre 2.2s ease .6s forwards; }
+    .marque img { display: block; height: auto; width: clamp(200px, 36vw, 560px); }
+    @media (orientation: portrait) { .marque img { width: clamp(170px, 46vw, 300px); } }
+    .cache { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .phrase {
+      margin: clamp(18px, 3vh, 28px) 0 0;
+      font-size: clamp(14px, 1.5vw, 18px); font-weight: 300; letter-spacing: .08em; color: var(--voile);
+      opacity: 0; animation: paraitre 1.4s ease .9s forwards;
+    }
+    .phrase:empty { display: none; }
+    .bouton {
+      margin-top: clamp(26px, 5vh, 52px);
+      display: inline-block; padding: 13px 36px;
+      font-size: 13px; font-weight: 400; letter-spacing: .24em; text-transform: uppercase; text-decoration: none;
+      color: var(--blanc); border: 1px solid #f5f5f647; border-radius: 999px;
+      transition: color .35s, background .35s, border-color .35s;
+      opacity: 0; animation: paraitre 1.4s ease 1s forwards;
+    }
+    .bouton span { margin-right: -.24em; }
+    .bouton:hover { color: var(--fond); background: var(--blanc); border-color: var(--blanc); }
+    .bouton:focus-visible { outline: 2px solid var(--blanc); outline-offset: 5px; }
+    @keyframes paraitre { to { opacity: 1; } }
+
+    .pied {
+      position: absolute; bottom: 12px; left: 0; right: 0; margin: 0;
+      font-size: 12px; letter-spacing: .06em; color: var(--voile);
+      opacity: 0; animation: paraitre 1.4s ease 1.3s forwards;
+    }
+    .pied a { color: inherit; text-decoration: none; padding: 8px; }
+    .pied a:hover, .pied a:focus-visible { color: var(--blanc); }
+  </style>
+</head>
+<body>
+  <main class="ecran">
+    <div class="piste" aria-hidden="true">
+      <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <!-- Tracé dessiné pour la page, inspiré du plan type du client : la longue ligne droite de départ
+               et sa grille, les épingles parallèles en serpentin. Ce n'est pas une copie du plan. -->
+          <path id="trace" d="M 500 780 L 1340 780 C 1400 780 1440 740 1440 680 L 1440 220 C 1440 150 1340 150 1340 220 L 1340 520 C 1340 590 1240 590 1240 520 L 1240 190 C 1240 140 1210 110 1160 110 L 840 110 C 790 110 760 140 760 180 L 760 200 C 760 270 660 270 660 200 L 660 180 C 660 140 630 110 590 110 L 290 110 C 200 110 160 150 160 230 L 160 560 C 160 630 260 630 260 560 L 260 380 C 260 310 360 310 360 380 L 360 680 C 360 740 400 780 460 780 Z"/>
+          <!-- Les deux bords de la piste, calculés par le script à partir du tracé -->
+          <path id="bord-dedans"/>
+          <path id="bord-dehors"/>
+          <radialGradient id="phare">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".14" stop-color="#f3f6ff" stop-opacity=".8"/>
+            <stop offset=".45" stop-color="#e6ecff" stop-opacity=".13"/>
+            <stop offset="1" stop-color="#e6ecff" stop-opacity="0"/>
+          </radialGradient>
+          <mask id="eclairage" maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900">
+            <rect width="1600" height="900" fill="#000"/>
+            <!-- L'éclairage avance le long du tracé, jamais en cercle autour de la lumière :
+                 les deux bords de la piste s'allument au même niveau, même dans un virage.
+                 Chaque bande éclaire une longueur derrière la lumière, rien devant (en unités du tracé, ou en part du tour). -->
+            <g fill="none" stroke="#fff" stroke-width="64" id="sillage">
+              <use href="#trace" stroke-opacity=".12" data-arriere=".46t"/>
+              <use href="#trace" stroke-opacity=".2" data-arriere=".28t"/>
+              <use href="#trace" stroke-opacity=".34" data-arriere=".12t"/>
+              <use href="#trace" stroke-opacity=".16" data-arriere="150"/>
+              <use href="#trace" stroke-opacity=".22" data-arriere="110"/>
+              <use href="#trace" stroke-opacity=".3" data-arriere="70"/>
+              <use href="#trace" stroke-opacity=".45" data-arriere="35"/>
+            </g>
+          </mask>
+        </defs>
+
+        <!-- La piste dans le noir, à peine devinée -->
+        <use href="#trace" fill="none" stroke="#0c0c0e" stroke-width="50" stroke-linejoin="round"/>
+
+        <!-- La piste éclairée, révélée par le masque : le sol, les vibreurs rouge et noir sur les deux bords, la grille et le damier de départ -->
+        <g mask="url(#eclairage)" fill="none" stroke-linejoin="round">
+          <use href="#trace" stroke="#17171a" stroke-width="52"/>
+          <g stroke-width="6">
+            <use href="#bord-dedans" stroke="#e10600"/><use href="#bord-dedans" stroke="#050506" stroke-dasharray="14 14"/>
+            <use href="#bord-dehors" stroke="#e10600"/><use href="#bord-dehors" stroke="#050506" stroke-dasharray="14 14"/>
+          </g>
+          <path d="M 640 766 H 650 V 794 H 640 M 690 766 H 700 V 794 H 690 M 740 766 H 750 V 794 H 740 M 790 766 H 800 V 794 H 790 M 840 766 H 850 V 794 H 840" stroke="#f5f5f6" stroke-width="1.5"/>
+          <g stroke="none" fill="#f5f5f6">
+            <rect x="890" y="756" width="6" height="8"/><rect x="896" y="764" width="6" height="8"/>
+            <rect x="890" y="772" width="6" height="8"/><rect x="896" y="780" width="6" height="8"/>
+            <rect x="890" y="788" width="6" height="8"/><rect x="896" y="796" width="6" height="8"/>
+          </g>
+        </g>
+
+        <!-- Le trait de lumière et le phare -->
+        <use id="filet" href="#trace" fill="none" stroke="#f3f6ff" stroke-width="1.5" stroke-linecap="round" stroke-opacity=".9"/>
+        <circle id="lueur" r="95" fill="url(#phare)"/>
+        <circle id="point" r="3.5" fill="#fff"/>
+      </svg>
+    </div>
+
+    <div class="centre">
+      <div class="marque">
+        <img src="images/logo-openlap-70.png" width="1554" height="538" alt="">
+        <h1 class="cache" data-texte="nom">OPENLAP</h1>
+      </div>
+      <p class="phrase" data-texte="phrase">Coming summer 2027</p>
+      <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
+    </div>
+
+    <p class="pied"><a href="mentions-legales.html">Mentions légales</a></p>
+  </main>
+
+  <script>
+    (function () {
+      var trace = document.getElementById('trace');
+      var total = trace.getTotalLength();
+      var lueur = document.getElementById('lueur');
+      var point = document.getElementById('point');
+      var filet = document.getElementById('filet');
+      var sillage = document.querySelectorAll('#sillage use');
+      // Longueur de piste éclairée derrière la lumière, pour chaque bande du masque
+      function longueur(texte) { return !texte ? 0 : texte.slice(-1) === 't' ? parseFloat(texte) * total : parseFloat(texte); }
+      var bandes = [].map.call(sillage, function (u) { return longueur(u.dataset.arriere); });
+      var filetLong = 0.16 * total;
+      var depart = 60;           // le point de départ, en unités du tracé : sur la grille, avant la ligne
+      var tour = 16000;          // durée d'un tour, en ms
+
+      // Les vibreurs suivent chaque bord de la piste : leurs blocs gardent la même longueur
+      // à l'intérieur et à l'extérieur des virages (un pointillé posé sur l'axe s'étirerait dehors et se tasserait dedans)
+      [["bord-dedans", 27], ["bord-dehors", -27]].forEach(function (bord) {
+        var pas = 4, d = '';
+        for (var s = 0; s < total; s += pas) {
+          var p = trace.getPointAtLength(s), q = trace.getPointAtLength((s + 1) % total);
+          var tx = q.x - p.x, ty = q.y - p.y, l = Math.hypot(tx, ty) || 1;
+          d += (d ? 'L' : 'M') + (p.x - ty / l * bord[1]).toFixed(1) + ' ' + (p.y + tx / l * bord[1]).toFixed(1);
+        }
+        document.getElementById(bord[0]).setAttribute('d', d + 'Z');
+      });
+
+      function placer(avance) {
+        var pos = (depart + avance) % total;
+        var p = trace.getPointAtLength(pos);
+        lueur.setAttribute('cx', p.x); lueur.setAttribute('cy', p.y);
+        point.setAttribute('cx', p.x); point.setAttribute('cy', p.y);
+        for (var i = 0; i < sillage.length; i++) {
+          var l = Math.min(bandes[i], avance);
+          sillage[i].setAttribute('stroke-dasharray', l + ' ' + (total - l));
+          sillage[i].setAttribute('stroke-dashoffset', -(pos - l));
+        }
+        var f = Math.min(filetLong, avance);
+        filet.setAttribute('stroke-dasharray', f + ' ' + (total - f));
+        filet.setAttribute('stroke-dashoffset', -(pos - f));
+      }
+
+      // ?fige=0.45 arrête la lumière à 45 % du tour : sert aux captures
+      var fige = new URLSearchParams(location.search).get('fige');
+      // La lumière tourne même si l'appareil demande moins d'animations : elle est l'objet de la page
+      if (fige !== null) {
+        placer(parseFloat(fige) * total + total);
+      } else {
+        var debut = null;
+        placer(0);
+        requestAnimationFrame(function image(t) {
+          if (debut === null) debut = t + 500;
+          var ecoule = Math.max(0, t - debut);
+          // Départ en douceur sur le premier tiers de tour, puis vitesse constante
+          var tours = ecoule / tour;
+          var avance = tours < 0.3 ? (tours * tours) / 0.6 : tours - 0.15;
+          placer(avance * total);
+          requestAnimationFrame(image);
+        });
+      }
+    })();
+  </script>
+  <!-- Menu des essais : démonstration seulement, à retirer avant la mise en ligne -->
+  <script src="essais.js" defer></script>
+</body>
+</html>
