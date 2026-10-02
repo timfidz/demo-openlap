@@ -127,7 +127,7 @@
         <!-- Toute la piste reste visible, faiblement éclairée : le sol, et en très atténué les vibreurs, la grille et le damier -->
         <use href="#trace" fill="none" stroke="#0e0e10" stroke-width="58" stroke-linejoin="round"/>
         <g fill="none" stroke-linejoin="round" opacity=".3">
-          <g stroke-width="6.5">
+          <g stroke-width="9">
             <use href="#bord-dedans" stroke="#e10600"/><use href="#bord-dedans" stroke="#050506" stroke-dasharray="26 26"/>
             <use href="#bord-dehors" stroke="#e10600"/><use href="#bord-dehors" stroke="#050506" stroke-dasharray="26 26"/>
           </g>
@@ -138,7 +138,7 @@
         <!-- La même piste en pleine lumière, révélée par le masque au passage de la lumière : le sol, les vibreurs rouge et noir sur les deux bords, la grille et le damier de départ -->
         <g mask="url(#eclairage)" fill="none" stroke-linejoin="round">
           <use href="#trace" stroke="#17171a" stroke-width="60"/>
-          <g stroke-width="6.5">
+          <g stroke-width="9">
             <use href="#bord-dedans" stroke="#e10600"/><use href="#bord-dedans" stroke="#050506" stroke-dasharray="26 26"/>
             <use href="#bord-dehors" stroke="#e10600"/><use href="#bord-dehors" stroke="#050506" stroke-dasharray="26 26"/>
           </g>
@@ -186,7 +186,7 @@
         for (var i = 0; i < n; i++) {
           var avant = pts[(i - 1 + n) % n], apres = pts[(i + 1) % n];
           var tx = apres.x - avant.x, ty = apres.y - avant.y, l = Math.hypot(tx, ty) || 1;
-          var nx = -ty / l * 32, ny = tx / l * 32, c = i ? 'L' : 'M';
+          var nx = -ty / l * 33.5, ny = tx / l * 33.5, c = i ? 'L' : 'M';
           dedans += c + (pts[i].x + nx).toFixed(1) + ' ' + (pts[i].y + ny).toFixed(1);
           dehors += c + (pts[i].x - nx).toFixed(1) + ' ' + (pts[i].y - ny).toFixed(1);
         }
