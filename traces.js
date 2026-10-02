@@ -1,6 +1,7 @@
 // Traces de gomme dans les épingles (essai, Tim 03/10/2026 ; idée reprise des volutes du plan préféré du client).
-// Calculées depuis le tracé, comme les vibreurs : les trois virages qui tournent le plus reçoivent deux fines traces
-// (les deux pneus arrière) qui glissent vers l'extérieur du virage et s'effacent à la sortie. Elles sont posées dans
+// Calculées depuis le tracé, comme les vibreurs : chaque épingle, et chaque freinage au bout d'une longue ligne droite,
+// reçoit deux fines traces (les deux pneus arrière) qui glissent vers l'extérieur du virage et s'effacent à la sortie ;
+// plus la ligne droite d'avant est longue, plus la trace est marquée (Tim, 03/10 : trois virages seulement faisaient bizarre). Elles sont posées dans
 // le calque éclairé : invisibles dans le noir, révélées au passage de la lumière, éteintes avec la traînée.
 // Masquées tant que le menu des essais ne les montre pas (classe « traces », attribut hidden).
 // Si l'essai est retenu : retirer l'attribut hidden et le display: none ci-dessous, puis inclure ce fichier dans la page finale.
@@ -63,16 +64,24 @@
         debut = Math.abs(v) > seuil ? i : -1;
       }
     }
-    // Les épingles (plus de 140 degrés), les trois qui tournent le plus
-    var retenus = virages.filter(function (v) { return Math.abs(v.tourne) > 2.45; })
-      .sort(function (a, b) { return Math.abs(b.tourne) - Math.abs(a.tourne); }).slice(0, 3);
+    // Où la gomme se dépose vraiment : dans toutes les épingles (plus de 140 degrés), et au freinage des virages
+    // francs (plus de 80 degrés) qui suivent une longue ligne droite (plus de 300 unités). La trace est d'autant plus
+    // marquée que la ligne droite d'avant est longue (on arrive vite) ; au freinage, elle commence plus tôt.
+    virages.forEach(function (v, i) {
+      var precedent = virages[(i - 1 + virages.length) % virages.length];
+      v.droite = (i ? v.debut - precedent.fin : v.debut + (n - precedent.fin)) * pas;   // en unités du tracé
+      v.force = 0.55 + 0.45 * Math.min(1, v.droite / 400);
+      v.freinage = v.droite > 300;
+    });
+    var retenus = virages.filter(function (v) { return Math.abs(v.tourne) > 2.45 || (Math.abs(v.tourne) > 1.4 && v.freinage); });
 
     // 3. Une trace : de l'entrée du virage (un peu avant) à la sortie (plus loin : le kart glisse encore en sortant),
     //    en quelques morceaux d'opacité croissante puis décroissante (une trace qui apparaît et s'efface)
     function marque(v, decalage, ecart, force) {
-      var long = v.fin - v.debut, a = v.debut - Math.round(long * 0.15), b = v.fin + Math.round(long * 0.45);
+      var long = v.fin - v.debut, b = v.fin + Math.round(long * 0.45);
+      var a = v.debut - Math.round(v.freinage ? Math.min(long * 0.9, v.droite / pas * 0.3) : long * 0.15);
       var dehors = -Math.sign(v.tourne);   // côté extérieur du virage
-      var parMorceau = Math.max(2, Math.ceil((b - a) / 8));
+      var parMorceau = Math.max(2, Math.ceil((b - a) / 6));   // six morceaux par trace : assez pour le fondu, peu de chemins
       for (var m = a; m < b; m += parMorceau) {
         var d = '';
         for (var j = m; j <= Math.min(b, m + parMorceau); j++) {
@@ -86,7 +95,7 @@
         }
         var milieu = Math.min(1, Math.max(0, (m + parMorceau / 2 - a) / (b - a)));
         var opacite = Math.pow(Math.sin(Math.PI * milieu), 0.8) * force;
-        [[ecart, 0.5], [ecart * 0.4, 0.9]].forEach(function (couche) {
+        (force < 1 ? [[ecart, 0.7]] : [[ecart, 0.5], [ecart * 0.4, 0.9]]).forEach(function (couche) {
           var chemin = document.createElementNS(NS, 'path');
           chemin.setAttribute('d', d);
           chemin.setAttribute('stroke-width', couche[0].toFixed(1));
@@ -97,12 +106,13 @@
     }
     retenus.forEach(function (v) {
       // Deux pneus arrière, espacés comme sur un kart ; un second passage plus pâle, légèrement décalé
-      marque(v, 0, 6, 1);
-      marque(v, -9, 6, 1);
-      marque(v, 7, 4, 0.5);
-      marque(v, -2, 4, 0.5);
+      marque(v, 0, 6, v.force);
+      marque(v, -9, 6, v.force);
+      marque(v, 7, 4, 0.5 * v.force);
+      marque(v, -2, 4, 0.5 * v.force);
     });
-    // Où sont les traces, en part du tour (fin de chaque épingle) : sert à choisir ?fige pour les captures
+    groupe.setAttribute('data-chemins', String(groupe.childNodes.length));
+    // Où sont les traces, en part du tour (fin de chaque virage) : sert à choisir ?fige pour les captures
     groupe.setAttribute('data-longueur', total.toFixed(0));
     groupe.setAttribute('data-virages', retenus.map(function (v) { return (v.fin * pas / total).toFixed(3); }).join(' '));
   }

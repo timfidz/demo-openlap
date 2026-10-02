@@ -4,11 +4,12 @@
 // Les couleurs retenues seront alors écrites dans les pages elles-mêmes, à la place de #e10600 et du noir des blocs.
 /* global location, document -- script de navigateur */
 (function () {
+  // Numérotés pour le client, sans nom, pour ne pas l'orienter : 1 épurée, 2 barrières, 3 plein écran, 4 tracé libre
   var essais = [
-    ['index.html', 'Épurée'],
-    ['barrieres.html', 'Barrières'],
-    ['grand.html', 'Plein écran'],
-    ['libre.html', 'Tracé libre']
+    ['index.html', '1'],
+    ['barrieres.html', '2'],
+    ['grand.html', '3'],
+    ['libre.html', '4']
   ];
   // Les rouges à comparer ; le premier est celui écrit dans les pages
   var rouges = [
@@ -39,10 +40,11 @@
   style.textContent =
     '.essais { --rouge: ' + ORIGINE + '; position: fixed; left: 12px; top: 50%; transform: translateY(-50%); z-index: 20; display: grid; gap: 2px;' +
     ' padding: 8px 6px; border: 1px solid #f5f5f61f; border-radius: 12px; background: #050506cc; }' +
-    '.essais a { display: block; padding: 7px 10px; border-radius: 8px; font: 500 11px/1 "Inter", "Segoe UI", Arial, sans-serif;' +
-    ' letter-spacing: .12em; text-transform: uppercase; text-decoration: none; color: #9a9aa2; white-space: nowrap; }' +
+    '.essais .pages { display: flex; justify-content: center; gap: 2px; }' +
+    '.essais a { display: block; min-width: 30px; padding: 8px 6px; border-radius: 8px; text-align: center; font: 500 12px/1 "Inter", "Segoe UI", Arial, sans-serif;' +
+    ' letter-spacing: .06em; text-decoration: none; color: #9a9aa2; white-space: nowrap; }' +
     '.essais a:hover, .essais a:focus-visible { color: #f5f5f6; background: #f5f5f614; outline: none; }' +
-    '.essais a[aria-current] { color: #f5f5f6; box-shadow: inset 2px 0 0 var(--rouge); }' +
+    '.essais a[aria-current] { color: #f5f5f6; box-shadow: inset 0 -2px 0 var(--rouge); }' +
     '.essais .rouges { display: flex; justify-content: center; gap: 1px; margin-top: 6px; padding: 5px 2px 0; border-top: 1px solid #f5f5f61f; }' +
     '.essais button { box-sizing: border-box; width: 24px; height: 24px; padding: 4px; border: 0; border-radius: 50%; background-clip: content-box !important; cursor: pointer; flex: none; }' +
     '.essais button[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px #f5f5f6; }' +
@@ -54,8 +56,7 @@
     '.essais button.bascule[aria-pressed="true"] { color: #f5f5f6; box-shadow: inset 2px 0 0 var(--rouge); }' +
     '@media (orientation: portrait) { .essais { left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; padding: 4px;' +
     ' max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }' +
-    ' .essais a { padding: 7px 8px; font-size: 10px; letter-spacing: .06em; }' +
-    ' .essais a[aria-current] { box-shadow: inset 0 -2px 0 var(--rouge); }' +
+    ' .essais a { padding: 7px 6px; font-size: 11px; }' +
     ' .essais .rouges { width: auto; margin: 0; padding: 0 4px; border-top: 0; }' +
     ' .essais .jeux { display: flex; padding: 0 4px; } }';
   document.head.appendChild(style);
@@ -63,13 +64,17 @@
   var nav = document.createElement('nav');
   nav.className = 'essais';
   nav.setAttribute('aria-label', 'Versions de la page');
+  var pages = document.createElement('div');
+  pages.className = 'pages';
   essais.forEach(function (essai) {
     var lien = document.createElement('a');
     lien.href = essai[0];
     lien.textContent = essai[1];
+    lien.setAttribute('aria-label', 'Version ' + essai[1]);
     if (essai[0].replace(/\.html$/, '') === ici) lien.setAttribute('aria-current', 'page');
-    nav.appendChild(lien);
+    pages.appendChild(lien);
   });
+  nav.appendChild(pages);
 
   // Dans les pages, chaque vibreur est fait de deux traits superposés : un trait continu (le fond), et des blocs par-dessus
   var fonds = document.querySelectorAll('[stroke="' + ORIGINE + '"]');
