@@ -1,4 +1,4 @@
-// Menu des essais : une aide de démonstration pour passer d'une version de la page à l'autre et essayer plusieurs rouges.
+// Menu des essais : une aide de démonstration pour passer d'une version de la page à l'autre, essayer plusieurs rouges, et le rouge et noir ou le rouge et blanc.
 // À RETIRER AVANT LA MISE EN LIGNE : ce fichier, la balise <script src="essais.js"> de chaque page, et les pages non retenues.
 // Le rouge retenu sera alors écrit dans les pages elles-mêmes, à la place de #e10600.
 /* global location, document -- script de navigateur */
@@ -33,10 +33,14 @@
     '.essais button { width: 16px; height: 16px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; }' +
     '.essais button[aria-pressed="true"] { box-shadow: 0 0 0 2px #050506, 0 0 0 3.5px #f5f5f6; }' +
     '.essais button:focus-visible { outline: 2px solid #f5f5f6; outline-offset: 3px; }' +
-    '@media (orientation: portrait) { .essais { left: 50%; top: 8px; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; padding: 4px; }' +
+    '.essais .blocs { display: flex; justify-content: center; gap: 10px; padding: 8px 4px 3px; }' +
+    '.essais .blocs button { width: 34px; height: 14px; border-radius: 4px; border: 1px solid #f5f5f633; }' +
+    '@media (orientation: portrait) { .essais { left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; padding: 4px;' +
+    ' max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }' +
     ' .essais a { padding: 7px 8px; font-size: 10px; letter-spacing: .06em; }' +
     ' .essais a[aria-current] { box-shadow: inset 0 -2px 0 var(--rouge); }' +
-    ' .essais .rouges { width: 100%; margin-top: 2px; padding: 7px 4px 4px; } }';
+    ' .essais .rouges { width: auto; margin: 0; padding: 7px 6px 5px; border-top: 0; }' +
+    ' .essais .blocs { padding: 7px 6px 5px; } }';
   document.head.appendChild(style);
 
   var nav = document.createElement('nav');
@@ -74,6 +78,32 @@
     pastilles.appendChild(b);
   });
   nav.appendChild(pastilles);
+
+  // Les deux boutons des blocs : rouge et noir (ce qui est écrit dans les pages) ou rouge et blanc
+  var blocs = document.querySelectorAll('[stroke-dasharray][stroke="#050506"], [stroke-dasharray][stroke="#141416"]');
+  [].forEach.call(blocs, function (t) { t.dataset.noir = t.getAttribute('stroke'); });
+  var choixBlocs = document.createElement('div');
+  choixBlocs.className = 'blocs';
+  choixBlocs.setAttribute('role', 'group');
+  choixBlocs.setAttribute('aria-label', 'Couleur des blocs des vibreurs');
+  function appliquerBlocs(nom) {
+    [].forEach.call(blocs, function (t) { t.setAttribute('stroke', nom === 'blanc' ? '#f5f5f6' : t.dataset.noir); });
+    [].forEach.call(choixBlocs.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.blocs === nom)); });
+  }
+  [['noir', 'Rouge et noir', '#050506'], ['blanc', 'Rouge et blanc', '#f5f5f6']].forEach(function (c) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.blocs = c[0];
+    b.style.background = 'linear-gradient(90deg, var(--rouge) 50%, ' + c[2] + ' 50%)';
+    b.title = c[1];
+    b.setAttribute('aria-label', c[1]);
+    b.addEventListener('click', function () {
+      appliquerBlocs(c[0]);
+      try { localStorage.setItem('essais-blocs', c[0]); } catch (e) { /* stockage refusé : le choix ne vaut que pour cette page */ }
+    });
+    choixBlocs.appendChild(b);
+  });
+  nav.appendChild(choixBlocs);
   document.body.appendChild(nav);
 
   // ?rouge=c8102e dans l'adresse impose une couleur (sert aux captures) ; sinon, le dernier choix
@@ -81,4 +111,9 @@
   var choix = impose ? '#' + impose.replace('#', '') : retenu();
   var connus = rouges.map(function (r) { return r[0]; });
   appliquer(connus.indexOf(choix) >= 0 ? choix : ORIGINE);
+
+  // ?blocs=blanc dans l'adresse impose le rouge et blanc (sert aux captures) ; sinon, le dernier choix
+  var blocsRetenus = null;
+  try { blocsRetenus = localStorage.getItem('essais-blocs'); } catch (e) { /* stockage refusé */ }
+  appliquerBlocs((new URLSearchParams(location.search).get('blocs') || blocsRetenus) === 'blanc' ? 'blanc' : 'noir');
 })();
