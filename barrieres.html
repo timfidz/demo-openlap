@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#050506">
+  <meta name="robots" content="noindex, nofollow">
   <title>OPENLAP</title>
   <meta name="robots" content="noindex">
   <meta name="description" content="OPENLAP, karting indoor électrique haut de gamme en Île-de-France. Ouverture prochaine.">
@@ -48,7 +49,8 @@
 
     /* La piste et la lumière */
     .piste { position: relative; width: 100%; max-width: 1180px; container-type: size; }
-    .piste svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    /* overflow visible : le halo de la lumière ne doit pas être coupé au bord du dessin */
+    .piste svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
     @media (orientation: portrait) {
       /* Sur un écran en hauteur, la piste est tournée d'un quart de tour pour occuper la place */
       .piste svg {
