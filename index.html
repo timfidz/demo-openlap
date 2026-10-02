@@ -89,7 +89,7 @@
 <body>
   <main class="ecran">
     <div class="marque">
-      <img src="images/logo-openlap.png" width="1554" height="414" alt="">
+      <img src="images/logo-openlap-70.png" width="1554" height="538" alt="">
       <h1 class="cache" data-texte="nom">OPENLAP</h1>
     </div>
 
@@ -178,15 +178,21 @@
 
       // Les vibreurs suivent chaque bord de la piste : leurs blocs gardent la même longueur
       // à l'intérieur et à l'extérieur des virages (un pointillé posé sur l'axe s'étirerait dehors et se tasserait dedans)
-      [['bord-dedans', 31], ['bord-dehors', -31]].forEach(function (bord) {
-        var pas = 5, d = '';
-        for (var s = 0; s < total; s += pas) {
-          var p = trace.getPointAtLength(s), q = trace.getPointAtLength((s + 1) % total);
-          var tx = q.x - p.x, ty = q.y - p.y, l = Math.hypot(tx, ty) || 1;
-          d += (d ? 'L' : 'M') + (p.x - ty / l * bord[1]).toFixed(1) + ' ' + (p.y + tx / l * bord[1]).toFixed(1);
+      // Le tracé est mesuré une seule fois (c'est la partie lente), puis les deux bords sont déduits des mêmes points
+      (function () {
+        var pas = 8, pts = [];
+        for (var s = 0; s < total; s += pas) pts.push(trace.getPointAtLength(s));
+        var n = pts.length, dedans = '', dehors = '';
+        for (var i = 0; i < n; i++) {
+          var avant = pts[(i - 1 + n) % n], apres = pts[(i + 1) % n];
+          var tx = apres.x - avant.x, ty = apres.y - avant.y, l = Math.hypot(tx, ty) || 1;
+          var nx = -ty / l * 31, ny = tx / l * 31, c = i ? 'L' : 'M';
+          dedans += c + (pts[i].x + nx).toFixed(1) + ' ' + (pts[i].y + ny).toFixed(1);
+          dehors += c + (pts[i].x - nx).toFixed(1) + ' ' + (pts[i].y - ny).toFixed(1);
         }
-        document.getElementById(bord[0]).setAttribute('d', d + 'Z');
-      });
+        document.getElementById('bord-dedans').setAttribute('d', dedans + 'Z');
+        document.getElementById('bord-dehors').setAttribute('d', dehors + 'Z');
+      })();
 
       function placer(avance) {
         var pos = (depart + avance) % total;
