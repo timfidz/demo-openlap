@@ -150,7 +150,36 @@
     montrerTraces(oui);
   });
   if (document.querySelector('.traces')) nav.appendChild(boutonTraces);
+
+  // Tout éclairer : la piste entière en pleine lumière, pour juger les couleurs et les traces sans attendre la lumière.
+  // Un trait plein est ajouté dans chaque masque d'éclairage ; la lumière continue de tourner par-dessus.
+  var boutonEclairer = document.createElement('button');
+  boutonEclairer.type = 'button';
+  boutonEclairer.className = 'bascule';
+  boutonEclairer.textContent = 'Éclairer';
+  boutonEclairer.title = 'Toute la piste en pleine lumière';
+  var pleins = [];
+  function eclairer(oui) {
+    if (oui && !pleins.length) {
+      [].forEach.call(document.querySelectorAll('mask > g[stroke="#fff"]'), function (g) {
+        var plein = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        plein.setAttribute('href', '#trace');
+        g.appendChild(plein);
+        pleins.push(plein);
+      });
+    }
+    pleins.forEach(function (p) { p.style.display = oui ? '' : 'none'; });
+    boutonEclairer.setAttribute('aria-pressed', String(oui));
+  }
+  boutonEclairer.addEventListener('click', function () {
+    var oui = boutonEclairer.getAttribute('aria-pressed') !== 'true';
+    ecrire('essais-eclaire', oui ? 'oui' : 'non');
+    eclairer(oui);
+  });
+  nav.appendChild(boutonEclairer);
   document.body.appendChild(nav);
+  // ?eclaire=1 dans l'adresse l'impose (captures) ; sinon, le dernier choix fait
+  eclairer(adresse.has('eclaire') ? adresse.get('eclaire') === '1' : lire('essais-eclaire') === 'oui');
   // ?traces=1 dans l'adresse les impose (captures) ; sinon, le dernier choix fait
   montrerTraces(adresse.has('traces') ? adresse.get('traces') === '1' : lire('essais-traces') === 'oui');
 
