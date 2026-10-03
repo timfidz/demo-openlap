@@ -156,6 +156,26 @@
   });
   if (document.querySelector('.traces')) nav.appendChild(boutonTraces);
 
+  // Le trait de lumière derrière le point (#filet) : montré ou non, choix retenu d'une page à l'autre
+  var boutonTrait = document.createElement('button');
+  boutonTrait.type = 'button';
+  boutonTrait.className = 'bascule';
+  boutonTrait.textContent = 'Trait';
+  boutonTrait.title = 'Le trait de lumière derrière le point';
+  function montrerTrait(oui) {
+    var filet = document.getElementById('filet');
+    if (filet) filet.style.display = oui ? '' : 'none';
+    boutonTrait.setAttribute('aria-pressed', String(oui));
+  }
+  boutonTrait.addEventListener('click', function () {
+    var oui = boutonTrait.getAttribute('aria-pressed') !== 'true';
+    ecrire('essais-trait', oui ? 'oui' : 'non');
+    montrerTrait(oui);
+  });
+  if (document.getElementById('filet')) nav.appendChild(boutonTrait);
+  // ?trait=0 dans l'adresse le retire (captures) ; sinon, le dernier choix fait, sinon montré
+  montrerTrait(adresse.has('trait') ? adresse.get('trait') === '1' : lire('essais-trait') !== 'non');
+
   // Le curseur « liserés au repos » : de 0 (piste sombre, le rouge n'existe que dans la lumière) à 100 % (toute la piste
   // comme en pleine lumière). Il règle l'opacité de la couche .repos-liseres de la page ; les marquages au sol suivent à
   // partir de 30 %. Le réglage est retenu d'une page à l'autre.

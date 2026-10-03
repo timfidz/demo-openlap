@@ -12,14 +12,15 @@ dialog.infos[open] { display: grid; place-items: center; animation: infos-entree
 dialog.infos::backdrop { background: #050506c7; -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); }
 dialog.infos[open]::backdrop { animation: infos-voile .5s ease; }
 /* À l'ouverture, le focus va au texte (lu en premier par un lecteur d'écran), pas au bouton Fermer */
-dialog.infos .contenu { max-width: 36rem; text-align: center; outline: none; }
+dialog.infos .contenu { max-width: 34rem; text-align: center; outline: none; }
 dialog.infos h2 {
   margin: 0 0 clamp(18px, 3vh, 28px);
   font-size: 12px; font-weight: 400; letter-spacing: .32em; text-transform: uppercase; color: var(--voile, #9a9aa2);
 }
+/* Le texte du client : fin et aéré, un peu espacé, un blanc légèrement cassé ; la taille reste lisible sur téléphone */
 dialog.infos p {
   margin: 0 0 clamp(26px, 5vh, 44px); white-space: pre-line;
-  font-size: clamp(17px, 1.9vw, 21px); font-weight: 300; line-height: 1.65; letter-spacing: .01em;
+  font-size: clamp(16px, 1.55vw, 19px); font-weight: 300; line-height: 1.85; letter-spacing: .035em; color: #e8e8ec;
 }
 /* Le bouton Fermer reprend le bouton de la page, sans son apparition retardée */
 dialog.infos .bouton { opacity: 1; animation: none; }
