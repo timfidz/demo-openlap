@@ -133,7 +133,7 @@
         </defs>
 
         <!-- Au repos : le sol de la piste, puis les liserés (éteints par défaut) et les marquages au sol -->
-        <use class="dessine" href="#trace" fill="none" stroke="#0e0e10" stroke-width="58" stroke-linejoin="round"/>
+        <use href="#trace" fill="none" stroke="#0e0e10" stroke-width="58" stroke-linejoin="round"/>
         <!-- Les liserés au repos : éteints par défaut (opacité 0) ; le curseur du menu des essais règle cette opacité de 0 à 100 % -->
         <g fill="none" stroke-linejoin="round" class="repos-liseres" opacity="0">
           <g stroke-width="4">
@@ -255,26 +255,10 @@ Partenaires, fournisseurs : écrivez-nous.
       if (fige !== null) {
         placer(parseFloat(fige) * total + total);
       } else {
-        // À l'arrivée, la piste se dessine d'un trait (1,8 s), puis la lumière part
-        var DESSIN = 1800;
-        var traits = [].map.call(document.querySelectorAll('.dessine, .dessine use'), function (e) {
-          var cible = e.getAttribute('href') ? document.querySelector(e.getAttribute('href')) : null;
-          return cible && cible.getTotalLength ? { e: e, l: cible.getTotalLength() } : null;
-        }).filter(Boolean);
-        var marquages = document.querySelectorAll('.repos-marquages');
-        traits.forEach(function (x) { x.e.setAttribute('stroke-dasharray', '0 ' + x.l); });
-        [].forEach.call(marquages, function (g) { g.style.opacity = '0'; g.style.transition = 'opacity .8s ease'; });
         var debut = null;
         placer(0);
         requestAnimationFrame(function image(t) {
-          if (debut === null) debut = t + DESSIN + 300;
-          var avancement = Math.min(1, (t - (debut - DESSIN - 300)) / DESSIN), doux = 1 - Math.pow(1 - avancement, 3);
-          traits.forEach(function (x) { x.e.setAttribute('stroke-dasharray', (doux * x.l) + ' ' + x.l); });
-          if (avancement >= 1 && traits.length) {
-            traits.forEach(function (x) { x.e.removeAttribute('stroke-dasharray'); });
-            [].forEach.call(marquages, function (g) { g.style.opacity = ''; });
-            traits = [];
-          }
+          if (debut === null) debut = t + 500;
           var ecoule = Math.max(0, t - debut);
           // Départ en douceur sur le premier tiers de tour, puis vitesse constante
           var tours = ecoule / tour;
