@@ -125,14 +125,14 @@
                  les deux bords de la piste s'allument au même niveau, même dans un virage.
                  Sa largeur est celle de la piste : il ne déborde pas sur les couloirs voisins.
                  Chaque bande éclaire une longueur derrière la lumière, rien devant (en unités du tracé, ou en part du tour).
-                 Longueurs divisées par deux le 03/10, comme sur l'épurée (demande du client : moitié moins de lumière derrière le point). -->
+                 Longueurs réglées le 03/10 pour faire à l'écran la même longueur que sur l'épurée (le circuit est dessiné plus grand ici). -->
             <g fill="none" stroke="#fff" stroke-width="56" id="sillage">
-              <use href="#trace" stroke-opacity=".26" data-arriere=".13t"/>
-              <use href="#trace" stroke-opacity=".4" data-arriere=".055t"/>
-              <use href="#trace" stroke-opacity=".16" data-arriere="150"/>
-              <use href="#trace" stroke-opacity=".22" data-arriere="110"/>
-              <use href="#trace" stroke-opacity=".3" data-arriere="70"/>
-              <use href="#trace" stroke-opacity=".45" data-arriere="35"/>
+              <use href="#trace" stroke-opacity=".26" data-arriere=".073t"/>
+              <use href="#trace" stroke-opacity=".4" data-arriere=".031t"/>
+              <use href="#trace" stroke-opacity=".16" data-arriere="84"/>
+              <use href="#trace" stroke-opacity=".22" data-arriere="62"/>
+              <use href="#trace" stroke-opacity=".3" data-arriere="39"/>
+              <use href="#trace" stroke-opacity=".45" data-arriere="20"/>
             </g>
           </mask>
         </defs>
@@ -209,7 +209,7 @@ Partenaires, fournisseurs : écrivez-nous.
       // Longueur de piste éclairée derrière la lumière, pour chaque bande du masque
       function longueur(texte) { return !texte ? 0 : texte.slice(-1) === 't' ? parseFloat(texte) * total : parseFloat(texte); }
       var bandes = [].map.call(sillage, function (u) { return longueur(u.dataset.arriere); });
-      var filetLong = 0.06 * total;
+      var filetLong = 0.034 * total;
       var depart = 600;          // le point de départ, en unités du tracé : sur la grille, avant la ligne
       var tour = 24000;          // durée d'un tour, en ms : la piste est grande, la lumière prend son temps
 

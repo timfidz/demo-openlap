@@ -115,15 +115,14 @@
             <!-- L'éclairage avance le long du tracé, jamais en cercle autour de la lumière :
                  les deux bords de la piste s'allument au même niveau, même dans un virage.
                  Chaque bande éclaire une longueur derrière la lumière, rien devant (en unités du tracé, ou en part du tour).
-                 Longueurs divisées par deux le 03/10, comme sur l'épurée (demande du client : moitié moins de lumière derrière le point). -->
+                 Longueurs réglées le 03/10 pour faire à l'écran la même longueur que sur l'épurée (mêmes bandes, le circuit est dessiné plus grand ici). -->
             <g fill="none" stroke="#fff" stroke-width="64" id="sillage">
-              <use href="#trace" stroke-opacity=".12" data-arriere=".23t"/>
-              <use href="#trace" stroke-opacity=".2" data-arriere=".14t"/>
-              <use href="#trace" stroke-opacity=".34" data-arriere=".06t"/>
-              <use href="#trace" stroke-opacity=".16" data-arriere="75"/>
-              <use href="#trace" stroke-opacity=".22" data-arriere="55"/>
-              <use href="#trace" stroke-opacity=".3" data-arriere="35"/>
-              <use href="#trace" stroke-opacity=".45" data-arriere="17.5"/>
+              <use href="#trace" stroke-opacity=".26" data-arriere="704"/>
+              <use href="#trace" stroke-opacity=".4" data-arriere="298"/>
+              <use href="#trace" stroke-opacity=".16" data-arriere="100"/>
+              <use href="#trace" stroke-opacity=".22" data-arriere="74"/>
+              <use href="#trace" stroke-opacity=".3" data-arriere="46"/>
+              <use href="#trace" stroke-opacity=".45" data-arriere="24"/>
             </g>
           </mask>
         </defs>
@@ -208,7 +207,7 @@ Partenaires, fournisseurs : écrivez-nous.
       // Longueur de piste éclairée derrière la lumière, pour chaque bande du masque
       function longueur(texte) { return !texte ? 0 : texte.slice(-1) === 't' ? parseFloat(texte) * total : parseFloat(texte); }
       var bandes = [].map.call(sillage, function (u) { return longueur(u.dataset.arriere); });
-      var filetLong = 0.08 * total;
+      var filetLong = 0.063 * total;
       var depart = 60;           // le point de départ, en unités du tracé : sur la grille, avant la ligne
       var tour = 16000;          // durée d'un tour, en ms
 
