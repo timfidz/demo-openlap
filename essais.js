@@ -177,8 +177,8 @@
   montrerTrait(adresse.has('trait') ? adresse.get('trait') === '1' : lire('essais-trait') !== 'non');
 
   // Le curseur « liserés au repos » : de 0 (piste sombre, le rouge n'existe que dans la lumière) à 100 % (toute la piste
-  // comme en pleine lumière). Il règle l'opacité de la couche .repos-liseres de la page ; les marquages au sol suivent à
-  // partir de leur opacité d'origine dans la page (30 %, ou 0 sur l'épurée où la piste est noire au repos). Le réglage n'est pas retenu d'une page à l'autre.
+  // comme en pleine lumière). Il règle l'opacité de la couche .repos-liseres de la page ; la grille et le damier
+  // suivent au même niveau. Le réglage n'est pas retenu d'une page à l'autre.
   var reglage = document.createElement('label');
   reglage.className = 'repos';
   var curseur = document.createElement('input');
@@ -186,7 +186,7 @@
   curseur.setAttribute('aria-label', 'Liserés au repos, en pourcentage');
   var valeur = document.createElement('span');
   reglage.appendChild(curseur); reglage.appendChild(valeur);
-  // Le réglage écrit dans la page (15 % sur l'épurée depuis le 03/10, 0 ailleurs) : point de départ du curseur ; en dessous et à ce niveau, la grille et le damier gardent leur opacité d'origine
+  // Le réglage écrit dans la page (15 % sur les quatre versions depuis le 03/10) : point de départ du curseur
   var liseres = document.querySelector('.repos-liseres');
   var reposPage = liseres ? Math.round(Number(liseres.getAttribute('opacity') || 0) * 100) : 0;
   function eclairer(pourcent) {
@@ -194,10 +194,7 @@
     curseur.value = String(pourcent);
     valeur.textContent = pourcent + ' %';
     [].forEach.call(document.querySelectorAll('.repos-liseres'), function (g) { g.setAttribute('opacity', String(pourcent / 100)); });
-    [].forEach.call(document.querySelectorAll('.repos-marquages'), function (g) {
-      if (!g.dataset.base) g.dataset.base = g.getAttribute('opacity') || '0.3';
-      g.setAttribute('opacity', String(pourcent > reposPage ? Math.max(Number(g.dataset.base), pourcent / 100) : Number(g.dataset.base)));
-    });
+    [].forEach.call(document.querySelectorAll('.repos-marquages'), function (g) { g.setAttribute('opacity', String(pourcent / 100)); });
   }
   curseur.addEventListener('input', function () { eclairer(Number(curseur.value)); });
   nav.appendChild(reglage);
