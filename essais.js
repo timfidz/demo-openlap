@@ -54,11 +54,16 @@
     '.essais button.bascule { width: auto; height: auto; margin-top: 4px; padding: 7px 10px; border-radius: 8px; background: none !important;' +
     ' font: 500 11px/1 "Inter", "Segoe UI", Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #9a9aa2; }' +
     '.essais button.bascule[aria-pressed="true"] { color: #f5f5f6; box-shadow: inset 2px 0 0 var(--rouge); }' +
+    '.essais .repos { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 8px 8px 4px; border-top: 1px solid #f5f5f61f;' +
+    ' font: 500 10px/1 "Inter", "Segoe UI", Arial, sans-serif; letter-spacing: .06em; color: #9a9aa2; }' +
+    '.essais .repos input { width: 96px; margin: 0; accent-color: var(--rouge); cursor: pointer; }' +
+    '.essais .repos span { min-width: 34px; text-align: right; }' +
     '@media (orientation: portrait) { .essais { left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; padding: 4px;' +
     ' max-width: calc(100vw - 16px); overflow-x: auto; scrollbar-width: none; }' +
     ' .essais a { padding: 7px 6px; font-size: 11px; }' +
     ' .essais .rouges { width: auto; margin: 0; padding: 0 4px; border-top: 0; }' +
-    ' .essais .jeux { display: flex; padding: 0 4px; } }';
+    ' .essais .jeux { display: flex; padding: 0 4px; }' +
+    ' .essais .repos { margin: 0; padding: 0 8px; border-top: 0; } .essais .repos input { width: 70px; } }';
   document.head.appendChild(style);
 
   var nav = document.createElement('nav');
@@ -151,35 +156,28 @@
   });
   if (document.querySelector('.traces')) nav.appendChild(boutonTraces);
 
-  // Tout éclairer : la piste entière en pleine lumière, pour juger les couleurs et les traces sans attendre la lumière.
-  // Un trait plein est ajouté dans chaque masque d'éclairage ; la lumière continue de tourner par-dessus.
-  var boutonEclairer = document.createElement('button');
-  boutonEclairer.type = 'button';
-  boutonEclairer.className = 'bascule';
-  boutonEclairer.textContent = 'Éclairer';
-  boutonEclairer.title = 'Toute la piste en pleine lumière';
-  var pleins = [];
-  function eclairer(oui) {
-    if (oui && !pleins.length) {
-      [].forEach.call(document.querySelectorAll('mask > g[stroke="#fff"]'), function (g) {
-        var plein = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        plein.setAttribute('href', '#trace');
-        g.appendChild(plein);
-        pleins.push(plein);
-      });
-    }
-    pleins.forEach(function (p) { p.style.display = oui ? '' : 'none'; });
-    boutonEclairer.setAttribute('aria-pressed', String(oui));
+  // Le curseur « liserés au repos » : de 0 (piste sombre, le rouge n'existe que dans la lumière) à 100 % (toute la piste
+  // comme en pleine lumière). Il règle l'opacité de la couche .repos-liseres de la page ; les marquages au sol suivent à
+  // partir de 30 %. Le réglage est retenu d'une page à l'autre.
+  var reglage = document.createElement('label');
+  reglage.className = 'repos';
+  var curseur = document.createElement('input');
+  curseur.type = 'range'; curseur.min = '0'; curseur.max = '100'; curseur.step = '5'; curseur.value = '0';
+  curseur.setAttribute('aria-label', 'Liserés au repos, en pourcentage');
+  var valeur = document.createElement('span');
+  reglage.appendChild(curseur); reglage.appendChild(valeur);
+  function eclairer(pourcent) {
+    pourcent = Math.max(0, Math.min(100, Math.round(pourcent / 5) * 5));
+    curseur.value = String(pourcent);
+    valeur.textContent = pourcent + ' %';
+    [].forEach.call(document.querySelectorAll('.repos-liseres'), function (g) { g.setAttribute('opacity', String(pourcent / 100)); });
+    [].forEach.call(document.querySelectorAll('.repos-marquages'), function (g) { g.setAttribute('opacity', String(Math.max(0.3, pourcent / 100))); });
   }
-  boutonEclairer.addEventListener('click', function () {
-    var oui = boutonEclairer.getAttribute('aria-pressed') !== 'true';
-    ecrire('essais-eclaire', oui ? 'oui' : 'non');
-    eclairer(oui);
-  });
-  nav.appendChild(boutonEclairer);
+  curseur.addEventListener('input', function () { eclairer(Number(curseur.value)); ecrire('essais-repos', curseur.value); });
+  nav.appendChild(reglage);
   document.body.appendChild(nav);
-  // ?eclaire=1 dans l'adresse l'impose (captures) ; sinon, le dernier choix fait
-  eclairer(adresse.has('eclaire') ? adresse.get('eclaire') === '1' : lire('essais-eclaire') === 'oui');
+  // ?repos=40 dans l'adresse impose le réglage (captures) ; sinon, le dernier choix fait, sinon 0
+  eclairer(Number(adresse.has('repos') ? adresse.get('repos') : lire('essais-repos') || 0) || 0);
   // ?traces=1 dans l'adresse les impose (captures) ; sinon, le dernier choix fait
   montrerTraces(adresse.has('traces') ? adresse.get('traces') === '1' : lire('essais-traces') === 'oui');
 

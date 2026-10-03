@@ -128,10 +128,19 @@
           </mask>
         </defs>
 
-        <!-- La piste au repos : un ruban sombre uni, sans couleur ; seuls la grille et le damier s'y devinent -->
+        <!-- Au repos : le sol de la piste, puis les liserés (éteints par défaut) et les marquages au sol -->
         <use href="#trace" fill="none" stroke="#101013" stroke-width="46" stroke-linejoin="round"/>
-        <g fill="none" opacity=".5">
+        <!-- Les liserés au repos : éteints par défaut (opacité 0) ; le curseur du menu des essais règle cette opacité de 0 à 100 % -->
+        <g fill="none" stroke-linejoin="round" class="repos-liseres" opacity="0">
+          <g stroke-width="3.5">
+            <use href="#bord-dedans" stroke="#e10600"/><use href="#bord-dedans" stroke="#050506" stroke-dasharray="32 32"/>
+            <use href="#bord-dehors" stroke="#e10600"/><use href="#bord-dehors" stroke="#050506" stroke-dasharray="32 32"/>
+          </g>
+        </g>
+        <!-- La grille et le damier restent visibles au repos -->
+        <g class="repos-marquages" fill="none" opacity=".3">
           <path d="M 690 834 H 704 V 868 H 690 M 785 834 H 799 V 868 H 785 M 880 834 H 894 V 868 H 880 M 975 834 H 989 V 868 H 975 M 1070 834 H 1084 V 868 H 1070 M 1160 834 H 1174 V 868 H 1160" stroke="#f5f5f6" stroke-width="2"/>
+
           <g stroke="none" fill="#f5f5f6"><rect x="1255" y="833" width="9" height="9"/><rect x="1264" y="842" width="9" height="9"/><rect x="1255" y="851" width="9" height="9"/><rect x="1264" y="860" width="9" height="9"/></g>
         </g>
 

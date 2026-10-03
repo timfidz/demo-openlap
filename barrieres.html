@@ -157,8 +157,9 @@
             <use href="#b8"/>
         </g>
 
-        <!-- Tout le circuit reste visible, faiblement éclairé : les barrières, la grille et le damier, très atténués -->
-        <g fill="none" stroke-linejoin="round" opacity=".3">
+        <!-- Au repos : les barrières (éteintes par défaut) et les marquages au sol -->
+        <!-- Les liserés au repos : éteints par défaut (opacité 0) ; le curseur du menu des essais règle cette opacité de 0 à 100 % -->
+        <g fill="none" stroke-linejoin="round" class="repos-liseres" opacity="0">
           <g stroke="#e10600" stroke-width="13" stroke-linecap="round">
             <use href="#b0"/>
             <use href="#b1"/>
@@ -181,7 +182,11 @@
             <use href="#b7"/>
             <use href="#b8"/>
           </g>
+        </g>
+        <!-- La grille et le damier restent visibles au repos -->
+        <g class="repos-marquages" fill="none" opacity=".3">
           <path d="M 690 815 H 712 V 887 H 690 M 785 815 H 807 V 887 H 785 M 880 815 H 902 V 887 H 880 M 975 815 H 997 V 887 H 975 M 1070 815 H 1092 V 887 H 1070 M 1160 815 H 1182 V 887 H 1160" fill="none" stroke="#f5f5f6" stroke-width="3"/>
+
           <g fill="#f5f5f6"><rect x="1255" y="812" width="12" height="13"/><rect x="1267" y="825" width="12" height="13"/><rect x="1255" y="838" width="12" height="13"/><rect x="1267" y="851" width="12" height="13"/><rect x="1255" y="864" width="12" height="13"/><rect x="1267" y="877" width="12" height="13"/></g>
         </g>
 
