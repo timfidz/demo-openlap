@@ -4,9 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#050506">
-  <title>OPENLAP — Coming summer 2027</title>
+  <title>OPENLAP — Ouverture en 2027</title>
   <meta name="robots" content="noindex">
   <meta name="description" content="OPENLAP, karting indoor électrique haut de gamme en Île-de-France. Ouverture prochaine.">
+  <meta property="og:title" content="OPENLAP — Ouverture en 2027">
+  <meta property="og:description" content="Karting indoor électrique haut de gamme, en région parisienne.">
+  <meta property="og:image" content="https://timfidz.github.io/demo-openlap/images/apercu.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preload" href="polices/inter.woff2" as="font" type="font/woff2" crossorigin>
   <style>
@@ -26,7 +33,7 @@
     html, body { height: 100%; }
     body {
       margin: 0;
-      background: var(--fond);
+      background: radial-gradient(ellipse 70% 42% at 50% 0%, #111115 0%, var(--fond) 75%) var(--fond);
       color: var(--blanc);
       font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -62,7 +69,7 @@
     .bas { display: grid; justify-items: center; }
     .phrase {
       margin: 0 0 clamp(12px, 2.4vh, 22px);
-      font-size: clamp(14px, 1.5vw, 17px); font-weight: 300; letter-spacing: .08em; color: var(--voile);
+      font-size: clamp(11px, 1.1vw, 13px); font-weight: 400; letter-spacing: .3em; text-transform: uppercase; color: var(--voile);
       opacity: 0; animation: paraitre 1.4s ease .9s forwards;
     }
     .phrase:empty { display: none; }
@@ -110,10 +117,10 @@
           <path id="b7" d="M 77 393 L 245 393 C 290 393 315 365 315 325 L 315 240"/>
           <path id="b8" d="M 315 366 L 315 645 C 315 685 290 702 250 702 L 195 702 C 130 702 96 735 87 772"/>
           <radialGradient id="phare">
-            <stop offset="0" stop-color="#fffdf5"/>
-            <stop offset=".14" stop-color="#fff3cf" stop-opacity=".8"/>
-            <stop offset=".45" stop-color="#fff3cf" stop-opacity=".12"/>
-            <stop offset="1" stop-color="#fff3cf" stop-opacity="0"/>
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".14" stop-color="#f3f6ff" stop-opacity=".8"/>
+            <stop offset=".45" stop-color="#f3f6ff" stop-opacity=".12"/>
+            <stop offset="1" stop-color="#f3f6ff" stop-opacity="0"/>
           </radialGradient>
           <mask id="eclairage" maskUnits="userSpaceOnUse" x="0" y="0" width="1500" height="1049">
             <rect width="1500" height="1049" fill="#000"/>
@@ -145,7 +152,7 @@
         </defs>
 
         <!-- Les barrières dans le noir, à peine devinées -->
-        <g fill="none" stroke="#0d0d0f" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+        <g class="dessine" fill="none" stroke="#0d0d0f" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
             <use href="#b0"/>
             <use href="#b1"/>
             <use href="#b2"/>
@@ -222,14 +229,14 @@
         </g>
 
         <!-- Le trait de lumière et le phare -->
-        <use id="filet" href="#trace" fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linecap="round" stroke-opacity=".9"/>
+        <use id="filet" href="#trace" fill="none" stroke="#f3f6ff" stroke-width="2.5" stroke-linecap="round" stroke-opacity=".9"/>
         <circle id="lueur" r="105" fill="url(#phare)"/>
-        <circle id="point" r="5" fill="#fffdf5"/>
+        <circle id="point" r="5" fill="#fff"/>
       </svg>
     </div>
 
     <div class="bas">
-      <p class="phrase" data-texte="phrase">Coming summer 2027</p>
+      <p class="phrase" data-texte="phrase" style="margin-right: -.3em">Ouverture en 2027</p>
       <div class="boutons">
         <a class="bouton" data-courriel href="mailto:contact@exemple.fr?subject=Prise%20de%20contact%20Openlap"><span data-texte="bouton">Contact</span></a>
         <button type="button" class="bouton" data-infos data-si-presentation aria-haspopup="dialog" aria-controls="infos"><span data-texte="bouton2">Le projet</span></button>
@@ -289,10 +296,26 @@ Partenaires, fournisseurs : écrivez-nous.
       if (fige !== null) {
         placer(parseFloat(fige) * total + total);
       } else {
+        // À l'arrivée, la piste se dessine d'un trait (1,8 s), puis la lumière part
+        var DESSIN = 1800;
+        var traits = [].map.call(document.querySelectorAll('.dessine, .dessine use'), function (e) {
+          var cible = e.getAttribute('href') ? document.querySelector(e.getAttribute('href')) : null;
+          return cible && cible.getTotalLength ? { e: e, l: cible.getTotalLength() } : null;
+        }).filter(Boolean);
+        var marquages = document.querySelectorAll('.repos-marquages');
+        traits.forEach(function (x) { x.e.setAttribute('stroke-dasharray', '0 ' + x.l); });
+        [].forEach.call(marquages, function (g) { g.style.opacity = '0'; g.style.transition = 'opacity .8s ease'; });
         var debut = null;
         placer(0);
         requestAnimationFrame(function image(t) {
-          if (debut === null) debut = t + 500;
+          if (debut === null) debut = t + DESSIN + 300;
+          var avancement = Math.min(1, (t - (debut - DESSIN - 300)) / DESSIN), doux = 1 - Math.pow(1 - avancement, 3);
+          traits.forEach(function (x) { x.e.setAttribute('stroke-dasharray', (doux * x.l) + ' ' + x.l); });
+          if (avancement >= 1 && traits.length) {
+            traits.forEach(function (x) { x.e.removeAttribute('stroke-dasharray'); });
+            [].forEach.call(marquages, function (g) { g.style.opacity = ''; });
+            traits = [];
+          }
           var ecoule = Math.max(0, t - debut);
           // Départ en douceur sur le premier tiers de tour, puis vitesse constante
           var tours = ecoule / tour;
